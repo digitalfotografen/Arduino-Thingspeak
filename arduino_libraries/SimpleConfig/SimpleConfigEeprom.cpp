@@ -166,14 +166,23 @@ int SimpleConfigEeprom::writeln(const char *buff,int maxlen){
   }
 
   int i = 0;
-  while (i < length){
+  // skip indents
+  while ((i < length) && ((buff[i] == ' ') || (buff[i] == '\t'))){
+    //Serial.println("Skiping indent");
+    i++;
+  }
+
+  // write data
+  while ((i < length) && (buff[i] != '#')){ // skip comments
     EEPROM.write(this->baseAddress + this->pos++, buff[i++]);
   }
   
   // make sure we terminate with new line
   if (!(buff[length -1] == '\n') || (buff[length -1] == '\r')){
-    Serial.println("terminate line");
-    EEPROM.write(this->baseAddress + this->pos++, '\n');
+    //Serial.println("terminate line");
+    if (i > 0){ // only terminate lines with content
+      EEPROM.write(this->baseAddress + this->pos++, '\n');
+    }
   }
   return this->endAddress - this->pos - this->baseAddress;
 }

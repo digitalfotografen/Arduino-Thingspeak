@@ -44,15 +44,38 @@ class SimpleConfig {
     */
     virtual boolean open(boolean write = false);
     virtual boolean close();
+
+    /* Retrieves value for selected key and group
+    * Returns null on fail
+    */
     virtual char* get(char *value, const char *key, const char* group = "");
+
+    /* Retrieves cstring value for selected key and group
+    * Returns defaultValue on fail
+    */
+    virtual char* getStr(char *value, const char *key, const char* group = "", const char* defaultValue = "");
+
+    /* Retrieves integer value for selected key and group
+    * Returns defaultValue on fail
+    */
+    virtual int getInt(const char *key, const char* group = "", int defaultValue = 0);
+
+    /* Retrieves float value for selected key and group
+    * Returns defaultValue on fail
+    */
+    virtual float getFloat(const char *key, const char* group = "", float defaultValue = 0);
+
     virtual boolean available();
     /* Displays configuration to terminal 
     */
     virtual void display();
-    /* Writes on line to storage. 
+    /* Writes one line to storage. 
     * Returns 0 on fail, returns remaining free space on success
     */
     virtual int writeln(const char *buff,int maxlen = ROW_LENGTH);
+    /* Reads one line from storage. 
+    * Returns 0 on fail, returns length on success
+    */
     virtual int readln(char *buff,int maxlen = ROW_LENGTH);
 
   protected:

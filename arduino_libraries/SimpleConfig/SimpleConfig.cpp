@@ -106,6 +106,47 @@ char* SimpleConfig::get(char *value, const char *key, const char* group){
   return NULL;
 }
 
+char* SimpleConfig::getStr(char *value, const char *key, const char* group, const char* defaultValue){
+  char* result = this->get(value, key, group);
+  if (result == NULL){
+    Serial.print("Return default value for key:");
+    Serial.print(key);
+    Serial.print(" group:");
+    Serial.println(group);
+    strcpy(value, defaultValue);
+ }
+  return result;
+}
+
+int SimpleConfig::getInt(const char *key, const char* group, int defaultValue){
+  char s[ROW_LENGTH] = "";
+  if (this->get(s, key, group)){
+    return atoi(s);
+  }
+  
+  Serial.print("Return default value for key:");
+  Serial.print(key);
+  Serial.print(" group:");
+  Serial.println(group);
+  return defaultValue;
+}
+
+
+float SimpleConfig::getFloat(const char *key, const char* group, float defaultValue){
+  char s[ROW_LENGTH] = "";
+  if (this->get(s, key, group)){
+    float value = atof(s);
+    return value;
+  }
+  
+  Serial.print("Return default value for key:");
+  Serial.print(key);
+  Serial.print(" group:");
+  Serial.println(group);
+  return defaultValue;
+}
+
+
 void SimpleConfig::display(){
   char row[ROW_LENGTH+1] = "";
 
