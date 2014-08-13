@@ -5,8 +5,6 @@
 #include "Arduino.h"
 
 static byte keep_ADCSRA; // ADC power control
-static int analogPowerPin = -1;
-static boolean analogPower = false;
 
 
 class AnalogSensor : virtual public Sensor {
@@ -23,13 +21,12 @@ class AnalogSensor : virtual public Sensor {
     /* Powersave
     */
     virtual void sleep();
-        
+    
   private:
     int pin;
     float rangeMin;
     float rangeMax;
 };
-
 
 #endif
 

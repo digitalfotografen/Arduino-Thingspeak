@@ -1,6 +1,8 @@
 #include "TempSensor.h"
 #include "Arduino.h"
 
+boolean TempSensor::busActivated = false;
+
 TempSensor::TempSensor(char *_label, const byte * address) : Sensor(_label){
   if (address != NULL){
     for (int i=0; i<8; i++){
@@ -26,6 +28,9 @@ void TempSensor::setAddress(char *strAddress){
 }
 
 void TempSensor::measure(){
+  if (!busActivated){
+    this->prepare();
+  }
   Serial.print("TempSensor measure ");
   Serial.print(label);
   Serial.print(": ");
@@ -35,14 +40,21 @@ void TempSensor::measure(){
 }
 
 unsigned long TempSensor::prepare(){
-  unsigned long t = 750;
-  dallasSensors.begin();
-  dallasSensors.setResolution(this->address, 12);
-  dallasSensors.requestTemperatures();
+  unsigned long t = Sensor::prepare();
+  if (!busActivated){
+    Serial.println("preparing TempSensor");
+    dallasSensors.begin();
+    busActivated = true;
+    dallasSensors.setResolution(12); // global for all sensors
+    dallasSensors.requestTemperatures();
+    t = 750;
+  }
   return t;
 }
 
 void TempSensor::sleep(){
+  busActivated = 0;
+  Sensor::sleep();
 }
 
 

@@ -1,6 +1,7 @@
 #include "AnalogSensor.h"
 #include "Arduino.h"
 
+
 AnalogSensor::AnalogSensor(char *_label, int _adcPinNumber, float _rangeMin, float _rangeMax) : Sensor(_label){
   this->pin = _adcPinNumber;
   this->rangeMin = _rangeMin;
@@ -20,24 +21,9 @@ void AnalogSensor::measure(){
 
 unsigned long AnalogSensor::prepare(){
   unsigned long t = 0;
-  if (!analogPower & (analogPowerPin >= 0)){
-    digitalWrite(analogPowerPin, HIGH);
-    t+= 50; // time until distance sensors stable
-    analogPower = true;
-  }
-  
-  if (ADCSRA == 0){
-    //ADCSRA = keep_ADCSRA;
-    t += 5;
-  }
-  return t;
+  return t +   Sensor::prepare();
 }
 
 void AnalogSensor::sleep(){
-  if (analogPower & (analogPowerPin >= 0)){
-    digitalWrite(analogPowerPin, LOW);
-    analogPower = false;
-  }
-  
-  //ADCSRA = 0;
+  Sensor::sleep();
 }

@@ -1,5 +1,8 @@
 #include "Sensor.h"
 
+int Sensor::sensorPowerPin = -1;
+
+
 Sensor::Sensor(char *_label){
   strcpy(this->label, _label);
   strcpy(this->labelMin, "");
@@ -8,13 +11,25 @@ Sensor::Sensor(char *_label){
 }
 
 unsigned long Sensor::prepare(){
-  return 0;
+  unsigned long t = 0;
+  if (!sensorPower && (sensorPowerPin >= 0)){
+    Serial.println("sensor power on");
+    digitalWrite(sensorPowerPin, HIGH);
+    t+= 50;
+    sensorPower = true;
+  }
+  return t;
 }
 
 void Sensor::measure(){
 }
 
 void Sensor::sleep(){
+  if (sensorPower && (sensorPowerPin >= 0)){
+    Serial.println("sensor power off");
+    digitalWrite(sensorPowerPin, LOW);
+    sensorPower = false;
+  }
 }
 
 float Sensor::map(float x, float in_min, float in_max, float out_min, float out_max){

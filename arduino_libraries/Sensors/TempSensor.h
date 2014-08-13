@@ -38,6 +38,7 @@ class TempSensor : virtual public Sensor {
         
   private:
     byte address[8];
+    static boolean busActivated;
 };
 
 

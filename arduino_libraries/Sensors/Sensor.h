@@ -10,6 +10,8 @@
 
 enum SensorValue {SENSOR_AVERAGE, SENSOR_MIN, SENSOR_MAX};
 
+static boolean sensorPower = false;
+
 class Sensor {
   public:
     Sensor(char *_label);
@@ -48,6 +50,8 @@ class Sensor {
     void setLabelMin(char *buff);
     void getLabelMax(char *buff);
     void setLabelMax(char *buff);
+
+    static int sensorPowerPin;
   
   protected:
     char label[10];
