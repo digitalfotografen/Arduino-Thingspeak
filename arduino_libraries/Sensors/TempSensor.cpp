@@ -9,8 +9,7 @@ TempSensor::TempSensor(char *_label, const byte * address) : Sensor(_label){
       this->address[i] = address[i];
     }
   }
-  //dallasSensors.begin();
-  //dallasSensors.setResolution(this->address, 12);
+  this->setPrepareTime(750);
 }
 
 void TempSensor::setAddress(char *strAddress){
@@ -40,14 +39,17 @@ void TempSensor::measure(){
 }
 
 unsigned long TempSensor::prepare(){
+  Serial.print("TempSensorSensor prepare ");
+  Serial.println(this->label);
   unsigned long t = Sensor::prepare();
   if (!busActivated){
     Serial.println("preparing TempSensor");
     dallasSensors.begin();
     busActivated = true;
+    delay(10);
     dallasSensors.setResolution(12); // global for all sensors
+    delay(10);
     dallasSensors.requestTemperatures();
-    t = 750;
   }
   return t;
 }

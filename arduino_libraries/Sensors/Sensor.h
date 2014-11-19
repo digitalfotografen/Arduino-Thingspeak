@@ -21,6 +21,11 @@ class Sensor {
     */
     virtual unsigned long prepare(); 
 
+    /* set time in ms to wait between prepare an measure
+    * default 0
+    */
+    void setPrepareTime(unsigned long t); 
+
     /* Measure and store value in statistics
     */
     virtual void measure();
@@ -57,6 +62,7 @@ class Sensor {
     char label[10];
     char labelMax[10];
     char labelMin[10];
+    unsigned long prepareTime;
     Statistic statistic;
 };
 

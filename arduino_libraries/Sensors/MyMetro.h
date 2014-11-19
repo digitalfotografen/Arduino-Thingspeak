@@ -7,8 +7,8 @@ class MyMetro{
     boolean check();
     void setPeriod(unsigned long period);
   private:
-    unsigned long period;
-    unsigned long last;
-    unsigned long lastMillis;
-    unsigned long myMillis;
+    volatile unsigned long period;
+    volatile unsigned long last;
+    volatile unsigned long lastMillis;
+    volatile unsigned long myMillis;
 };

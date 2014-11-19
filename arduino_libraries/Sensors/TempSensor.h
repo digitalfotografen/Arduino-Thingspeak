@@ -6,8 +6,11 @@
 #include <DallasTemperature.h>
 #include "Sensor.h"
 
+#define ONEWIRE_PIN 40
+
+
 // Setup a oneWire instance to communicate with any OneWire devices
-static OneWire oneWire(8);
+static OneWire oneWire(ONEWIRE_PIN);
 
 // Pass our oneWire reference to Dallas Temperature. 
 static DallasTemperature dallasSensors(&oneWire);

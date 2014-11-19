@@ -8,12 +8,12 @@ SensorGroup::SensorGroup(){
 }
 
 void SensorGroup::addSensor(Sensor *sensor){
-  this->sensors[numberOfSensors++] = sensor;
+  this->sensors[this->numberOfSensors++] = sensor;
 }
 
 void SensorGroup::measureAll(){
   if (numberOfSensors > 0){
-    for (int i = 0; i < numberOfSensors; i++){
+    for (int i = 0; i < this->numberOfSensors; i++){
       sensors[i]->measure();
     }
   } else {
@@ -23,9 +23,11 @@ void SensorGroup::measureAll(){
 
 unsigned long SensorGroup::prepare(){
   unsigned long maxTime = 0;
+  unsigned long t = 0;
   if (numberOfSensors > 0){
     for (int i = 0; i < this->numberOfSensors; i++){
-      maxTime = max(maxTime, this->sensors[i]->prepare());
+      t = this->sensors[i]->prepare();
+      maxTime = max(maxTime, t);
     }
     return maxTime;
   } else {

@@ -8,10 +8,11 @@ Sensor::Sensor(char *_label){
   strcpy(this->labelMin, "");
   strcpy(this->labelMax, "");
   statistic.clear();
+  this->prepareTime = 0;
 }
 
 unsigned long Sensor::prepare(){
-  unsigned long t = 0;
+  unsigned long t = this->prepareTime;
   if (!sensorPower && (sensorPowerPin >= 0)){
     Serial.println("sensor power on");
     digitalWrite(sensorPowerPin, HIGH);
@@ -19,6 +20,10 @@ unsigned long Sensor::prepare(){
     sensorPower = true;
   }
   return t;
+}
+
+void Sensor::setPrepareTime(unsigned long t){
+  this->prepareTime = t;
 }
 
 void Sensor::measure(){

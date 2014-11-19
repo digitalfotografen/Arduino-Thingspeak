@@ -14,14 +14,20 @@ void AnalogSensor::measure(){
   Serial.print("AnalogSensor measure ");
   Serial.print(label);
   Serial.print(": ");
-  int value = analogRead(pin);
-  Serial.println(value);
-  this->statistic.add( this->map(float(value), 0, 1023, this->rangeMin, this->rangeMax) );
+  int value = analogRead(this->pin);
+  Serial.print(value);
+  Serial.print(" = ");
+  float fValue = this->map(float(value), 0, 1023, this->rangeMin, this->rangeMax);
+  Serial.println(fValue);
+  this->statistic.add( fValue );
 }
 
 unsigned long AnalogSensor::prepare(){
-  unsigned long t = 0;
-  return t +   Sensor::prepare();
+  Serial.print("AnalogSensor prepare ");
+  Serial.println(this->label);
+  unsigned long t = Sensor::prepare();
+  analogRead(this->pin); 
+  return t;
 }
 
 void AnalogSensor::sleep(){

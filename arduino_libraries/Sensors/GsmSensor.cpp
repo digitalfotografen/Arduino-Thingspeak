@@ -5,6 +5,7 @@ GsmSensor::GsmSensor(char *_label) : Sensor(_label){
   active = false;
 }
 
+#ifdef GSM_H
 void GsmSensor::measure(){
   Serial.println("GSM sensor measure ");
   byte status;
@@ -32,6 +33,7 @@ void GsmSensor::measure(){
     }
   }
 }
+#endif
 
 unsigned long GsmSensor::prepare(){
   return 0;
