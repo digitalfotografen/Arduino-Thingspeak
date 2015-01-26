@@ -38,8 +38,14 @@
 
 class SimpleConfigEeprom : virtual public SimpleConfig{
   public:
+    /*
+    * baseAddress defines where in eeprom config starts.
+    * it may use all EEPROM after baseAddress and end is detected depending on processor type
+    */
     SimpleConfigEeprom(int baseAddress = 0);
+    
     virtual boolean begin();
+
     /* Open file
     * write flag is set true to write file from start
     * Returns true on success
@@ -55,7 +61,7 @@ class SimpleConfigEeprom : virtual public SimpleConfig{
 
   protected:
     int baseAddress;
-    int endAddress;
+//    int endAddress;
     int pos;
     boolean eof;
 };

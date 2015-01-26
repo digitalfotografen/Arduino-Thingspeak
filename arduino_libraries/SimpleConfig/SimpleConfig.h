@@ -31,6 +31,7 @@
 #define __SIMPLE_CONFIG_H__ 1
 
 #include "Arduino.h"
+#include <MultiLog.h>
 
 #define ROW_LENGTH 80 // max row length
 
@@ -65,14 +66,22 @@ class SimpleConfig {
     */
     virtual float getFloat(const char *key, const char* group = "", float defaultValue = 0);
 
+    /* Retrieves boolean value for selected key and group
+    * Returns true if value is any of: on, enabled, true, 1
+    * Returns defaultValue on fail
+    */
+    virtual boolean getBoolean(const char *key, const char* group = "", boolean defaultValue = false);
+
     virtual boolean available();
     /* Displays configuration to terminal 
     */
     virtual void display();
+
     /* Writes one line to storage. 
     * Returns 0 on fail, returns remaining free space on success
     */
     virtual int writeln(const char *buff,int maxlen = ROW_LENGTH);
+
     /* Reads one line from storage. 
     * Returns 0 on fail, returns length on success
     */
@@ -82,6 +91,8 @@ class SimpleConfig {
     static boolean opened;
     static boolean writeMode;
     static boolean initialised;
+    
+    virtual void debugDefaultKey(const char *key, const char* group);
 };
 
 #endif

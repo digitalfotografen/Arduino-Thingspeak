@@ -33,13 +33,12 @@
 
 /*
 * Constructor
-* file must be at root level
+* baseAddress defines where in eeprom config starts.
 */
 SimpleConfigEeprom::SimpleConfigEeprom(int _baseAddress)
 {
   this->baseAddress = _baseAddress;
   this->pos = 0;
-  this->endAddress = 1024;
 }
 
 /*
@@ -54,7 +53,7 @@ boolean SimpleConfigEeprom::begin()
     return true;
 
 #ifdef DEBUG
-  Serial.println("SimpleConfigEeprom::Initializing...");
+  Serial.println(F("SimpleConfigEeprom::Initializing..."));
 #endif
   // not much to do in base class 
 
@@ -84,7 +83,8 @@ boolean SimpleConfigEeprom::close()
 {
   // if writeMode, then remember to terminate file 
   if (this->writeMode){
-    EEPROM.write(this->baseAddress + this->pos, char(0x04));
+    //EEPROM.write(this->baseAddress + this->pos++, '\n');
+    EEPROM.write(this->baseAddress + this->pos++, char(0x04));
     this->eof = true;
   }
   this->writeMode = false;
@@ -101,7 +101,7 @@ boolean SimpleConfigEeprom::close()
 int SimpleConfigEeprom::readln(char *buff, int maxlen)
 {
   if (!this->opened){
-    Serial.println("SimpleConfigEeprom::readln NOT OPEN");
+    Serial.println(F("SimpleConfigEeprom::readln NOT OPEN"));
     return 0;
   }
   
@@ -151,38 +151,42 @@ int SimpleConfigEeprom::readln(char *buff, int maxlen)
 */
 boolean SimpleConfigEeprom::available()
 {
-  return (!this->eof & (this->baseAddress + this->pos <= this->endAddress));
+  return (!this->eof && (this->baseAddress + this->pos <= E2END));
 }
 
 int SimpleConfigEeprom::writeln(const char *buff,int maxlen){
-  if (!this->opened | !this->writeMode){
-    Serial.println("SimpleConfigEeprom::writeln NOT OPEN FOR WRITE");
-    return 0;
-  }
-  
   int length = min(strlen(buff), maxlen);
-    if (this->baseAddress + this->pos + length > this->endAddress){
+  int start = -1;
+  int end = length;
+
+  if (!this->opened | !this->writeMode){
+    Serial.println(F("SimpleConfigEeprom::writeln NOT OPEN FOR WRITE"));
+    return 0;
+  }
+  
+
+  if (this->baseAddress + this->pos + length > E2END){
     return 0;
   }
 
-  int i = 0;
-  // skip indents
-  while ((i < length) && ((buff[i] == ' ') || (buff[i] == '\t'))){
-    //Serial.println("Skiping indent");
-    i++;
-  }
+  if (length > 0){
+    // trim white space at both ends of buffer
+    while (isspace(buff[++start]));
+    while (isspace(buff[--end]) && (end != start));
 
-  // write data
-  while ((i < length) && (buff[i] != '#')){ // skip comments
-    EEPROM.write(this->baseAddress + this->pos++, buff[i++]);
-  }
+    // write data
+    int i = start;
+    int rowLength = 0;
+    while ((i <= end) && (buff[i] != '#')){  // skip comments
+      Serial.print(buff[i]);
+      EEPROM.write(this->baseAddress + this->pos++, buff[i++]);
+    }
   
-  // make sure we terminate with new line
-  if (!(buff[length -1] == '\n') || (buff[length -1] == '\r')){
-    //Serial.println("terminate line");
-    if (i > 0){ // only terminate lines with content
+    // terminate with new line, but only lines with content
+    if (i > start){
       EEPROM.write(this->baseAddress + this->pos++, '\n');
+      Serial.println();
     }
   }
-  return this->endAddress - this->pos - this->baseAddress;
+  return E2END - this->pos - this->baseAddress;
 }

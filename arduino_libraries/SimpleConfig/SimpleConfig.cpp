@@ -57,9 +57,7 @@ boolean SimpleConfig::begin()
   if (initialised)
     return true;
 
-#ifdef DEBUG
-  Serial.println("SimpleConfig::Initializing...");
-#endif
+  mlog.DEBUG(F("SimpleConfig::Initializing..."));
   // not much to do in base class 
 
   return true;
@@ -109,10 +107,7 @@ char* SimpleConfig::get(char *value, const char *key, const char* group){
 char* SimpleConfig::getStr(char *value, const char *key, const char* group, const char* defaultValue){
   char* result = this->get(value, key, group);
   if (result == NULL){
-    Serial.print("Return default value for key:");
-    Serial.print(key);
-    Serial.print(" group:");
-    Serial.println(group);
+    debugDefaultKey(key, group);
     strcpy(value, defaultValue);
  }
   return result;
@@ -124,10 +119,7 @@ int SimpleConfig::getInt(const char *key, const char* group, int defaultValue){
     return atoi(s);
   }
   
-  Serial.print("Return default value for key:");
-  Serial.print(key);
-  Serial.print(" group:");
-  Serial.println(group);
+  debugDefaultKey(key, group);
   return defaultValue;
 }
 
@@ -139,26 +131,35 @@ float SimpleConfig::getFloat(const char *key, const char* group, float defaultVa
     return value;
   }
   
-  Serial.print("Return default value for key:");
-  Serial.print(key);
-  Serial.print(" group:");
-  Serial.println(group);
+  debugDefaultKey(key, group);
   return defaultValue;
 }
 
+boolean SimpleConfig::getBoolean(const char *key, const char* group, boolean defaultValue){
+  char s[ROW_LENGTH] = "";
+  if (this->get(s, key, group)){
+    boolean value = false;
+    if (!strncmp(s, "true", 10)) value = true;
+    if (!strncmp(s, "on", 10)) value = true;
+    if (!strncmp(s, "1", 10)) value = true;
+    if (!strncmp(s, "enabled", 10)) value = true;
+    return value;
+  }
+  
+  debugDefaultKey(key, group);
+  return defaultValue;  
+}
 
 void SimpleConfig::display(){
   char row[ROW_LENGTH+1] = "";
-
-  Serial.println("=== Configuration ===");
+  mlog.INFO(F("=== Configuration ==="));
 
   this->open(false);
   while(this->available()){
     this->readln(row, ROW_LENGTH);
-    Serial.println(row);
+    mlog.INFO(row);
   }
-  Serial.println("=== END of Configuration ===");
-
+  mlog.INFO(F("=== END of Configuration ==="));
 }
 
 /*
@@ -168,7 +169,7 @@ void SimpleConfig::display(){
 */
 boolean SimpleConfig::open(boolean write)
 {
-  Serial.println("ERROR SimpleConfig::base class called");
+  mlog.WARNING(F("SimpleConfig::base class called"));
   return false;
 }
 
@@ -178,7 +179,7 @@ boolean SimpleConfig::open(boolean write)
 */
 boolean SimpleConfig::close()
 {
-  Serial.println("ERROR SimpleConfig::base class called");
+  mlog.WARNING(F("SimpleConfig::base class called"));
   // if writeMode, then remember to terminate file 
   return false;
 }
@@ -191,7 +192,7 @@ boolean SimpleConfig::close()
 */
 int SimpleConfig::readln(char *buff, int maxlen)
 {
-  Serial.println("ERROR SimpleConfig::base class called");
+  mlog.WARNING(F("SimpleConfig::base class called"));
   buff[0] = '\0';
   return NULL;
 }
@@ -201,11 +202,20 @@ int SimpleConfig::readln(char *buff, int maxlen)
 */
 boolean SimpleConfig::available()
 {
-  Serial.println("ERROR SimpleConfig::base class called");
+  mlog.WARNING(F("SimpleConfig::base class called"));
   return false;
 }
 
 int SimpleConfig::writeln(const char *buff, int maxlen){
-  Serial.println("ERROR SimpleConfig::base class called");
+  mlog.WARNING(F("SimpleConfig::base class called"));
   return 0;
+}
+
+void SimpleConfig::debugDefaultKey(const char *key, const char* group){
+  char message[80] = "";
+  strcat_P(message, PSTR("Config uses default value for key:"));
+  strcat(message, key);
+  strcat_P(message, PSTR(" group:"));
+  strcat(message, group);
+  mlog.DEBUG(message);
 }
