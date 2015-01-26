@@ -1,5 +1,6 @@
 #include "GsmSensor.h"
 #include "Arduino.h"
+#include "SIM900.h"
 
 GsmSensor::GsmSensor(char *_label) : Sensor(_label){
   active = false;

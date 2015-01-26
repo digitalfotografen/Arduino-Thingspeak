@@ -3,13 +3,14 @@
 
 #include "Sensor.h"
 #include "Arduino.h"
+#include "MultiLog.h"
 
 static byte keep_ADCSRA; // ADC power control
 
 
 class AnalogSensor : virtual public Sensor {
   public: 
-    AnalogSensor(char *_label, int _adcPinNumber, float _rangeMin, float _rangeMax);
+    AnalogSensor(char *_label, int _adcPinNumber);
 
     /* prepare sensor for measurement, turn on power
     * returns ms until ready
@@ -24,8 +25,6 @@ class AnalogSensor : virtual public Sensor {
     
   private:
     int pin;
-    float rangeMin;
-    float rangeMax;
 };
 
 #endif

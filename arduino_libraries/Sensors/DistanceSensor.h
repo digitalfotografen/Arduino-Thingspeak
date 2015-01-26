@@ -3,6 +3,7 @@
 
 #include "Sensor.h"
 #include "Arduino.h"
+#include "MultiLog.h"
 
 
 class DistanceSensor : virtual public Sensor {
@@ -10,11 +11,7 @@ class DistanceSensor : virtual public Sensor {
     DistanceSensor(char *_label,
                   int _inputPinNumber,
                   int _errorPinNumber,
-                  int _laserOnPinNumber,
-                  float _rangeMin, 
-                  float _rangeMax,
-                  float _adcMin = 0, 
-                  float _adcMax = 1023);
+                  int _laserOnPinNumber);
 
     /* prepare sensor for measurement, turn on laser
     * returns ms until ready
@@ -31,10 +28,6 @@ class DistanceSensor : virtual public Sensor {
     int inputPin;
     int errorPin;
     int laserOnPin;
-    float rangeMin;
-    float rangeMax;
-    float adcMin;
-    float adcMax;
 };
 
 #endif

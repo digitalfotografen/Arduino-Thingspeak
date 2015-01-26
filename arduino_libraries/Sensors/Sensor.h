@@ -7,6 +7,7 @@
 
 #include <Arduino.h>
 #include <Statistic.h>
+#include <MultiLog.h>
 
 enum SensorValue {SENSOR_AVERAGE, SENSOR_MIN, SENSOR_MAX};
 
@@ -14,7 +15,7 @@ static boolean sensorPower = false;
 
 class Sensor {
   public:
-    Sensor(char *_label);
+    Sensor(const char *_label = NULL);
     
     /* prepare sensor for measurement, turn on power
     * returns ms until ready
@@ -29,6 +30,11 @@ class Sensor {
     /* Measure and store value in statistics
     */
     virtual void measure();
+    
+    /* Measure and store value in statistics
+    */
+    virtual void putValue(int number);
+    virtual void putValue(float number);
     
     /* Powersave
     */
@@ -49,21 +55,34 @@ class Sensor {
 
     char* trim(char *str);
 
-    void getLabel(char *buff);
+    char *getLabel();
+    void setLabel(const char *buff);
 
     void getLabelMin(char *buff);
-    void setLabelMin(char *buff);
+    void setLabelMin(const char *buff);
     void getLabelMax(char *buff);
-    void setLabelMax(char *buff);
+    void setLabelMax(const char *buff);
 
+    /*Set output range for mapping av measured value
+    */
+    void setRangeOut(float rangeMin, float rangeMax);
+    /*Set input range for mapping av measured value
+    */
+    void setRangeIn(float rangeMin, float rangeMax);
+    
+    
     static int sensorPowerPin;
   
   protected:
-    char label[10];
-    char labelMax[10];
-    char labelMin[10];
+    char label[8];
+    char labelMax[8];
+    char labelMin[8];
     unsigned long prepareTime;
     Statistic statistic;
+    float rangeOutMin;
+    float rangeOutMax;
+    float rangeInMin;
+    float rangeInMax;
 };
 
 #endif

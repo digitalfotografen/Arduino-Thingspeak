@@ -5,18 +5,10 @@
 DistanceSensor::DistanceSensor(char *_label, 
                               int _inputPinNumber,  
                               int _errorPinNumber,
-                              int _laserOnPinNumber,
-                              float _rangeMin, 
-                              float _rangeMax,
-                              float _adcMin,
-                              float _adcMax) : Sensor(_label){
+                              int _laserOnPinNumber) : Sensor(_label){
   inputPin = _inputPinNumber;
   this->errorPin = _errorPinNumber;
   this->laserOnPin = _laserOnPinNumber;
-  this->rangeMin = _rangeMin;
-  this->rangeMax = _rangeMax;
-  this->adcMin = _adcMin;
-  this->adcMax = _adcMax;
   pinMode(this->inputPin, INPUT);
   pinMode(this->errorPin, INPUT_PULLUP);
   pinMode(this->laserOnPin, OUTPUT);
@@ -26,29 +18,36 @@ DistanceSensor::DistanceSensor(char *_label,
 }
 
 void DistanceSensor::measure(){
-  Serial.print("DistanceSensor measure ");
-  Serial.print(label);
+  mlog.DEBUG(F("DistanceSensor measure:"));
+  mlog.DEBUG(label, false);
   boolean error = !digitalRead(this->errorPin);
   if (!error){
-    int value = analogRead(this->inputPin); // medianvärdet
-    Serial.print(value);
-    Serial.print(" = ");
-    float fValue = this->map(float(value), 
-                              this->adcMin,
-                              this->adcMax, 
-                              this->rangeMin, 
-                              this->rangeMax);
+    int value = 0;
+    // make 20 samples and average as a low pass filter
+    for (int i = 0; i < 20; i++){
+      value += analogRead(this->inputPin);
+    }
+    float fValue = float(value) / 20;
+    mlog.DEBUG(F(" in:"), false);
+    mlog.DEBUG(fValue);
+    fValue = this->map(fValue, 
+                              this->rangeInMin,
+                              this->rangeInMax, 
+                              this->rangeOutMin, 
+                              this->rangeOutMax);
+    mlog.DEBUG(F(" out:"), false);
     Serial.println(fValue);
     this->statistic.add( fValue );
   } else {
-    Serial.println(": SENSOR ERROR!");
+    mlog.WARNING(F("SENSOR ERROR: "));
+    mlog.WARNING(label, false);
   }
 }
 
 unsigned long DistanceSensor::prepare(){
-  Serial.print("DistanceSensor prepare ");
-  Serial.println(this->label);
-  Serial.println("Laser on");
+  mlog.DEBUG("DistanceSensor prepare:");
+  mlog.DEBUG(this->label, false);
+  mlog.INFO("Laser on");
   digitalWrite(this->laserOnPin, HIGH);
   unsigned long t = Sensor::prepare();
   analogRead(this->inputPin); 
@@ -56,7 +55,7 @@ unsigned long DistanceSensor::prepare(){
 }
 
 void DistanceSensor::sleep(){
-  Serial.println("Laser off");
+   mlog.INFO("Laser off");
   digitalWrite(this->laserOnPin, LOW);
   Sensor::sleep();
 }

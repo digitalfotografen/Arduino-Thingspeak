@@ -33,3 +33,12 @@ void MyMetro::setPeriod(unsigned long period){
   this->lastMillis = millis();
   this->last = millis();
 }
+
+unsigned long MyMetro::getPeriod(){
+  return this->period;
+}
+
+void MyMetro::reset(){
+  this->lastMillis = millis();
+  this->last = this->myMillis;
+}

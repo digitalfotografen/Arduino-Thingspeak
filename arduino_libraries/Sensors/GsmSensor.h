@@ -3,7 +3,6 @@
 
 #include "Sensor.h"
 #include "Arduino.h"
-#include <SIM900.h>
 
 class GsmSensor : virtual public Sensor {
   public: 
@@ -25,7 +24,6 @@ class GsmSensor : virtual public Sensor {
     void deactivate();
         
   private:
-    int pin;
     boolean active;
 };
 

@@ -22,7 +22,7 @@ void TempSensor::setAddress(char *strAddress){
       tok = strtok(NULL," ,.\t");
     }
   } else {
-    Serial.println("Error TempSensor::setAddress empty or to short string");
+    mlog.WARNING(F("Error TempSensor::setAddress empty or to short string"));
   }
 }
 
@@ -30,20 +30,18 @@ void TempSensor::measure(){
   if (!busActivated){
     this->prepare();
   }
-  Serial.print("TempSensor measure ");
-  Serial.print(label);
-  Serial.print(": ");
+  mlog.DEBUG(F("TempSensor measure:"));
+  mlog.DEBUG(this->label, false);
+  mlog.DEBUG(F(" = "), false);
   float value = dallasSensors.getTempC(this->address);  
-  Serial.println(value);
+  mlog.DEBUG(value);
   this->statistic.add( value );
 }
 
 unsigned long TempSensor::prepare(){
-  Serial.print("TempSensorSensor prepare ");
-  Serial.println(this->label);
   unsigned long t = Sensor::prepare();
   if (!busActivated){
-    Serial.println("preparing TempSensor");
+    mlog.DEBUG(F("Preparing TempSensors"));
     dallasSensors.begin();
     busActivated = true;
     delay(10);
@@ -66,26 +64,28 @@ void TempSensor::discoverOneWireDevices(void) {
   byte present = 0;
   byte data[12];
   byte addr[8];
+  char toHex[5] = "";
   
-  Serial.print("Looking for 1-Wire devices...\n\r");
+  mlog.INFO(F("Looking for 1-Wire devices..."));
   while(oneWire.search(addr)) {
-    Serial.print("\n\rFound \'1-Wire\' device with address:\n\r");
+    mlog.INFO(F("Found \'1-Wire\' device with address:"));
     for( i = 0; i < 8; i++) {
-      Serial.print("0x");
+      mlog.INFO(F("0x"));
       if (addr[i] < 16) {
-        Serial.print('0');
+        mlog.INFO(F("0"));
       }
-      Serial.print(addr[i], HEX);
+      itoa(addr[i], toHex, 16);
+      mlog.INFO(toHex, false);
       if (i < 7) {
-        Serial.print(", ");
+        mlog.INFO(F(", "));
       }
     }
     if ( OneWire::crc8( addr, 7) != addr[7]) {
-        Serial.print("CRC is not valid!\n");
+        mlog.WARNING(F("CRC is not valid!\n"));
         return;
     }
   }
-  Serial.print("\n\r\n\rThat's it.\r\n");
+  mlog.INFO(F("That was all devices"));
   oneWire.reset_search();
   return;
 }

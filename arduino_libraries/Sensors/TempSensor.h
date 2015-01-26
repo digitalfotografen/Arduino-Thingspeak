@@ -5,6 +5,7 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include "Sensor.h"
+#include "MultiLog.h"
 
 #define ONEWIRE_PIN 40
 
@@ -19,7 +20,7 @@ static DallasTemperature dallasSensors(&oneWire);
 
 class TempSensor : virtual public Sensor {
   public: 
-    TempSensor(char *_label,  const byte * address = NULL);
+    TempSensor(char *_label = NULL,  const byte * address = NULL);
 
     /* Set sensor address from a string of hex digits
     * sample string: char s[] = "0x28, 0xDE, 0x15, 0x5D, 0x05, 0x00, 0x00, 0x17";

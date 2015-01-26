@@ -2,29 +2,36 @@
 #include "Arduino.h"
 
 
-AnalogSensor::AnalogSensor(char *_label, int _adcPinNumber, float _rangeMin, float _rangeMax) : Sensor(_label){
+AnalogSensor::AnalogSensor(char *_label, int _adcPinNumber) : Sensor(_label){
   this->pin = _adcPinNumber;
-  this->rangeMin = _rangeMin;
-  this->rangeMax = _rangeMax;
   pinMode(pin, INPUT);
   //keep_ADCSRA = ADCSRA;
 }
 
 void AnalogSensor::measure(){
-  Serial.print("AnalogSensor measure ");
-  Serial.print(label);
-  Serial.print(": ");
-  int value = analogRead(this->pin);
-  Serial.print(value);
-  Serial.print(" = ");
-  float fValue = this->map(float(value), 0, 1023, this->rangeMin, this->rangeMax);
-  Serial.println(fValue);
+  mlog.DEBUG(F("AnalogSensor measure:"));
+  mlog.DEBUG(label, false);
+  int value = 0; 
+  // make 20 samples and average as a low pass filter
+  for (int i = 0; i < 20; i++){
+    value += analogRead(this->pin);
+  }
+  float fValue = float(value) / 20;
+  mlog.DEBUG(" in:", false);
+  mlog.DEBUG(fValue);
+  fValue = this->map(fValue, 
+                            this->rangeInMin,
+                            this->rangeInMax, 
+                            this->rangeOutMin, 
+                            this->rangeOutMax);
+  mlog.DEBUG(" out:", false);
+  mlog.DEBUG(fValue);
   this->statistic.add( fValue );
 }
 
 unsigned long AnalogSensor::prepare(){
-  Serial.print("AnalogSensor prepare ");
-  Serial.println(this->label);
+  mlog.DEBUG(F("AnalogSensor prepare:"));
+  mlog.DEBUG(this->label, false);
   unsigned long t = Sensor::prepare();
   analogRead(this->pin); 
   return t;

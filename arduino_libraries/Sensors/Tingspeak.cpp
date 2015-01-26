@@ -14,8 +14,7 @@ void Thingspeak::toString(char* buff){
   strcat(buff, apiKey);
   if (numberOfSensors > 0){
     for (int i = 0; i < numberOfSensors; i++){
-      strcpy(tmp, "");
-      sensors[i]->getLabel(tmp);
+      strcpy(tmp, sensors[i]->getLabel());      
       if (tmp[0] != 0x00){
         strcat(buff, "&");
         strcat(buff, tmp);

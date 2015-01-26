@@ -3,18 +3,24 @@
 int Sensor::sensorPowerPin = -1;
 
 
-Sensor::Sensor(char *_label){
-  strcpy(this->label, _label);
+Sensor::Sensor(const char *_label){
+  if (_label != NULL){
+    strcpy(this->label, _label);
+  } else {
+    strcpy(this->label, "");
+  }
   strcpy(this->labelMin, "");
   strcpy(this->labelMax, "");
   statistic.clear();
   this->prepareTime = 0;
+  this->setRangeOut(0,1023);
+  this->setRangeIn(0,1023);
 }
 
 unsigned long Sensor::prepare(){
   unsigned long t = this->prepareTime;
   if (!sensorPower && (sensorPowerPin >= 0)){
-    Serial.println("sensor power on");
+    mlog.DEBUG(F("sensor power on"));
     digitalWrite(sensorPowerPin, HIGH);
     t+= 50;
     sensorPower = true;
@@ -29,9 +35,16 @@ void Sensor::setPrepareTime(unsigned long t){
 void Sensor::measure(){
 }
 
+void Sensor::putValue(int number){
+  this->statistic.add((float) number);
+}
+void Sensor::putValue(float number){
+  this->statistic.add(number);
+}
+
 void Sensor::sleep(){
   if (sensorPower && (sensorPowerPin >= 0)){
-    Serial.println("sensor power off");
+    mlog.DEBUG(F("sensor power off"));
     digitalWrite(sensorPowerPin, LOW);
     sensorPower = false;
   }
@@ -111,15 +124,23 @@ char * Sensor::trim(char *str)
     return str;
 }
 
-void Sensor::getLabel(char* buff){
-  strcpy(buff, this->label);
+char* Sensor::getLabel(){
+  if (!strlen(this->label)){
+    return NULL;
+  }
+//  strcpy(buff, this->label);
+  return this->label;
+}
+
+void Sensor::setLabel(const char* buff){
+  strcpy(this->label, buff);
 }
 
 void Sensor::getLabelMin(char* buff){
   strcpy(buff, this->labelMin);
 }
 
-void Sensor::setLabelMin(char* buff){
+void Sensor::setLabelMin(const char* buff){
   strcpy(this->labelMin, buff);
 }
 
@@ -127,10 +148,24 @@ void Sensor::getLabelMax(char* buff){
   strcpy(buff, this->labelMax);
 }
 
-void Sensor::setLabelMax(char* buff){
+void Sensor::setLabelMax(const char* buff){
   strcpy(this->labelMax, buff);
 }
 
+/*Set output range for mapping av measured value
+*/
+void Sensor::setRangeOut(float rangeMin, float rangeMax){
+  this->rangeOutMin = rangeMin;
+  this->rangeOutMax = rangeMax;
+}
+
+/*Set input range for mapping av measured value
+*/
+void Sensor::setRangeIn(float rangeMin, float rangeMax){
+  this->rangeInMin = rangeMin;
+  this->rangeInMax = rangeMax;
+}
+
 void Sensor::clear(){
-  statistic.clear();
+  this->statistic.clear();
 }

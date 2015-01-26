@@ -6,6 +6,8 @@ class MyMetro{
     void add(unsigned long ms);
     boolean check();
     void setPeriod(unsigned long period);
+    unsigned long getPeriod();
+    void reset();
   private:
     volatile unsigned long period;
     volatile unsigned long last;
