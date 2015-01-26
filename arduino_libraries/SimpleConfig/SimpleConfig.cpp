@@ -57,7 +57,7 @@ boolean SimpleConfig::begin()
   if (initialised)
     return true;
 
-  mlog.DEBUG(F("SimpleConfig::Initializing..."));
+  mlog.INFO(F("SimpleConfig::Initializing..."));
   // not much to do in base class 
 
   return true;
@@ -153,7 +153,6 @@ boolean SimpleConfig::getBoolean(const char *key, const char* group, boolean def
 void SimpleConfig::display(){
   char row[ROW_LENGTH+1] = "";
   mlog.INFO(F("=== Configuration ==="));
-
   this->open(false);
   while(this->available()){
     this->readln(row, ROW_LENGTH);
@@ -212,10 +211,8 @@ int SimpleConfig::writeln(const char *buff, int maxlen){
 }
 
 void SimpleConfig::debugDefaultKey(const char *key, const char* group){
-  char message[80] = "";
-  strcat_P(message, PSTR("Config uses default value for key:"));
-  strcat(message, key);
-  strcat_P(message, PSTR(" group:"));
-  strcat(message, group);
-  mlog.DEBUG(message);
+  mlog.DEBUG(F("Default config key:"));
+  mlog.DEBUG(key, false);
+  mlog.DEBUG(F(" group:"), false);
+  mlog.DEBUG(group, false);
 }

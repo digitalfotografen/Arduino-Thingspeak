@@ -53,7 +53,7 @@ boolean SimpleConfigEeprom::begin()
     return true;
 
 #ifdef DEBUG
-  Serial.println(F("SimpleConfigEeprom::Initializing..."));
+  mlog.INFO(F("SimpleConfigEeprom::Initializing..."));
 #endif
   // not much to do in base class 
 
@@ -72,6 +72,7 @@ boolean SimpleConfigEeprom::open(boolean write)
   this->writeMode = write;
   this->pos = 0;
   this->eof = false;
+  if (write) mlog.INFO(F("SimpleConfigEeprom open for write"));
   return true;
 }
 
@@ -86,6 +87,7 @@ boolean SimpleConfigEeprom::close()
     //EEPROM.write(this->baseAddress + this->pos++, '\n');
     EEPROM.write(this->baseAddress + this->pos++, char(0x04));
     this->eof = true;
+    mlog.INFO(F("SimpleConfigEeprom closed for write"));
   }
   this->writeMode = false;
   this->opened = true;
@@ -101,7 +103,7 @@ boolean SimpleConfigEeprom::close()
 int SimpleConfigEeprom::readln(char *buff, int maxlen)
 {
   if (!this->opened){
-    Serial.println(F("SimpleConfigEeprom::readln NOT OPEN"));
+    mlog.CRITICAL(F("SimpleConfigEeprom::readln NOT OPEN"));
     return 0;
   }
   
@@ -160,7 +162,7 @@ int SimpleConfigEeprom::writeln(const char *buff,int maxlen){
   int end = length;
 
   if (!this->opened | !this->writeMode){
-    Serial.println(F("SimpleConfigEeprom::writeln NOT OPEN FOR WRITE"));
+    mlog.CRITICAL(F("SimpleConfigEeprom::writeln NOT OPEN FOR WRITE"));
     return 0;
   }
   
