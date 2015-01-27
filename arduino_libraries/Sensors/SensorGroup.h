@@ -6,6 +6,7 @@
 
 #include "Sensor.h"
 #include "Arduino.h"
+#include "MultiLog.h"
 
 
 class SensorGroup {
