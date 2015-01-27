@@ -8,8 +8,14 @@
 
 #include <MultiLog.h>
 
+//byte MultiLog::_level = LOG_DEBUG;
+//byte MultiLog::_targets = LOG_SERIAL;
+//File MultiLog::_file = File();
 
-MultiLog::MultiLog(int level, byte targets)
+MultiLog mlog;
+
+
+MultiLog::MultiLog(byte level, byte targets)
 {
      setLevel(level);
      setTargets(targets);
@@ -50,6 +56,17 @@ void MultiLog::TRACE(const char* string, boolean label)
       print(string, F("\r\n[TRACE]: "));
     } else {
       print(string);
+    }
+  }
+}
+
+void MultiLog::TRACE(float number, boolean label)
+{
+  if (_level > 4) {
+    if (label){
+      print(number, F("\r\n[TRACE]: "));
+    } else {
+      print(number);
     }
   }
 }
@@ -96,6 +113,16 @@ void MultiLog::DEBUG(int number, boolean label){
   }
 }
 
+void MultiLog::DEBUG(float number, boolean label){
+  if (_level > 3) {
+    if (label){
+      print(number, F("\r\n[DEBUG]: "));
+    } else {
+      print(number);
+    }
+  }
+}
+
 
 void MultiLog::INFO(const __FlashStringHelper* string, boolean label){
   if (_level > 2) {
@@ -119,6 +146,16 @@ void MultiLog::INFO(const char* string, boolean label)
 }
 
 void MultiLog::INFO(int number, boolean label){
+  if (_level > 3) {
+    if (label){
+      print(number, F("\r\n[INFO]: "));
+    } else {
+      print(number);
+    }
+  }
+}
+
+void MultiLog::INFO(float number, boolean label){
   if (_level > 3) {
     if (label){
       print(number, F("\r\n[INFO]: "));
@@ -159,6 +196,16 @@ void MultiLog::WARNING(int number, boolean label){
   }
 }
 
+void MultiLog::WARNING(float number, boolean label){
+  if (_level > 3) {
+    if (label){
+      print(number, F("\r\n[WARNING]: "));
+    } else {
+      print(number);
+    }
+  }
+}
+
 void MultiLog::CRITICAL(const __FlashStringHelper* string, boolean label){
   if (label){
     print(string, F("\r\n[CRITICAL]: "));
@@ -184,4 +231,11 @@ void MultiLog::CRITICAL(int number, boolean label){
   }
 }
 
+void MultiLog::CRITICAL(float number, boolean label){
+  if (label){
+    print(number, F("\r\n[CRITICAL]: "));
+  } else {
+    print(number);
+  }
+}
 

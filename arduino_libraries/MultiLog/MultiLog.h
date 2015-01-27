@@ -28,34 +28,43 @@
 
 class MultiLog {
   public:
-    MultiLog(int level, byte targets = LOG_SERIAL);
+    File _file;
+    byte _level;
+    byte _targets;
+
+    MultiLog(byte level = LOG_INFO, byte targets = LOG_SERIAL);
     boolean openFile();
 
     void TRACE(const __FlashStringHelper* string, boolean label = false);
     void TRACE(const char* string, boolean label = false);
     void TRACE(int number, boolean label = false);
+    void TRACE(float number, boolean label = false);
 
     void DEBUG(const __FlashStringHelper* string, boolean label = true);
     void DEBUG(const char* string, boolean label = true);
     void DEBUG(int number, boolean label = false);
+    void DEBUG(float number, boolean label = false);
 
     void INFO(const __FlashStringHelper* string, boolean label = true);
     void INFO(const char* string, boolean label = true);
     void INFO(int number, boolean label = false);
+    void INFO(float number, boolean label = false);
 
     void WARNING(const __FlashStringHelper* string, boolean label = true);
     void WARNING(const char* string, boolean label = true);
     void WARNING(int number, boolean label = false);
+    void WARNING(float number, boolean label = false);
 
     void CRITICAL(const __FlashStringHelper* string, boolean label = true);
     void CRITICAL(const char* string, boolean label = true);
     void CRITICAL(int number, boolean label = false);
+    void CRITICAL(float number, boolean label = false);
 
 
-    inline int  getLevel(void)      {
+    inline byte  getLevel(void)      {
       return _level;
     }
-    inline void setLevel(int level) {
+    inline void setLevel(byte level) {
       _level = level;
     }
 
@@ -67,10 +76,6 @@ class MultiLog {
     }
 
   protected:
-    File _file;
-    int _level;
-    byte _targets;
-
     inline void fprint_P(const __FlashStringHelper *ifsh){
       const char PROGMEM *p = (const char PROGMEM *)ifsh;
       size_t n = 0;
@@ -132,8 +137,25 @@ class MultiLog {
           _file.flush();
         }
     }
+
+    inline void print(float number, 
+                      const __FlashStringHelper* label = NULL){
+        if (_targets & LOG_SERIAL){
+          if (label){
+            Serial.print(label);
+          }
+          Serial.print(number);
+        }
+        if (_targets & LOG_FILE){
+          if (label){
+            fprint_P(label);
+          }
+          _file.print(number);
+          _file.flush();
+        }
+    }
 };
 
-static MultiLog mlog = MultiLog(LOG_DEBUG, LOG_SERIAL);
+extern MultiLog mlog;
 
 #endif
