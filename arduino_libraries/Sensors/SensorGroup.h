@@ -2,7 +2,7 @@
 #ifndef SENSOR_GROUP_H
 #define SENSOR_GROUP_H
 
-#define MAX_SENSORS 8
+#define MAX_SENSORS 10
 
 #include "Sensor.h"
 #include "Arduino.h"

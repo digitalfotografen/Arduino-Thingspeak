@@ -8,7 +8,11 @@ SensorGroup::SensorGroup(){
 }
 
 void SensorGroup::addSensor(Sensor *sensor){
-  this->sensors[this->numberOfSensors++] = sensor;
+  if (this->numberOfSensors < MAX_SENSORS){
+    this->sensors[this->numberOfSensors++] = sensor;
+  } else {
+    mlog.CRITICAL(F("SensorGroup::addSensor tried to add to many sensors"));
+  }
 }
 
 void SensorGroup::measureAll(){
@@ -17,7 +21,7 @@ void SensorGroup::measureAll(){
       sensors[i]->measure();
     }
   } else {
-    Serial.println("ERROR: SensorGroup:measureAll There are no sensors");
+     mlog.WARNING(F("SensorGroup:measureAll There are no sensors"));
   }
 }
 
@@ -31,7 +35,7 @@ unsigned long SensorGroup::prepare(){
     }
     return maxTime;
   } else {
-    Serial.println("ERROR: SensorGroup:prepare There are no sensors");
+    mlog.WARNING(F("SensorGroup:prepare There are no sensors"));
     return 0;
   }  
 }
@@ -43,7 +47,7 @@ void SensorGroup::sleep(){
       this->sensors[i]->sleep();
     }
   } else {
-    Serial.println("ERROR: SensorGroup:prepare There are no sensors");
+    mlog.WARNING(F("ERROR: SensorGroup:prepare There are no sensors"));
   }  
 }
 
@@ -54,7 +58,7 @@ void SensorGroup::clear(){
       this->sensors[i]->clear();
     }
   } else {
-    Serial.println("ERROR: SensorGroup:prepare There are no sensors");
+    mlog.WARNING(F("ERROR: SensorGroup:prepare There are no sensors"));
   }  
 }
 

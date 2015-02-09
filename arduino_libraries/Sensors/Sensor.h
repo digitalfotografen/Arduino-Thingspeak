@@ -9,7 +9,7 @@
 #include <Statistic.h>
 #include <MultiLog.h>
 
-enum SensorValue {SENSOR_AVERAGE, SENSOR_MIN, SENSOR_MAX};
+enum SensorValue {SENSOR_LAST, SENSOR_AVERAGE, SENSOR_MIN, SENSOR_MAX};
 
 static boolean sensorPower = false;
 
@@ -31,10 +31,14 @@ class Sensor {
     */
     virtual void measure();
     
-    /* Measure and store value in statistics
+    /* Measure and store value
     */
     virtual void putValue(int number);
     virtual void putValue(float number);
+
+    /* get last value
+    */
+    virtual float getLast();
     
     /* Powersave
     */
@@ -78,6 +82,7 @@ class Sensor {
     char labelMax[8];
     char labelMin[8];
     unsigned long prepareTime;
+    float last;
     Statistic statistic;
     float rangeOutMin;
     float rangeOutMax;

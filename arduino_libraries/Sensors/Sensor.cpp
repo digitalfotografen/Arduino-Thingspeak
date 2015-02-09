@@ -36,10 +36,17 @@ void Sensor::measure(){
 }
 
 void Sensor::putValue(int number){
+  this->last = (float) number;
   this->statistic.add((float) number);
 }
+
 void Sensor::putValue(float number){
+  this->last = number;
   this->statistic.add(number);
+}
+
+float Sensor::getLast(){
+  return this->last;
 }
 
 void Sensor::sleep(){
@@ -57,6 +64,10 @@ float Sensor::map(float x, float in_min, float in_max, float out_min, float out_
 void Sensor::toString(char *buff, int maxLength, SensorValue valueType){
   float value;
   switch (valueType){
+    case SENSOR_LAST:
+      value = this->last;
+      break;
+
     case SENSOR_MIN:
       value = this->statistic.minimum();
       break;

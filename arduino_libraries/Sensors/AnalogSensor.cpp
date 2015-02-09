@@ -26,7 +26,7 @@ void AnalogSensor::measure(){
                             this->rangeOutMax);
   mlog.DEBUG(" out:", false);
   mlog.DEBUG(fValue);
-  this->statistic.add( fValue );
+  this->putValue( fValue );
 }
 
 unsigned long AnalogSensor::prepare(){

@@ -35,7 +35,7 @@ void TempSensor::measure(){
   mlog.DEBUG(F(" = "), false);
   float value = dallasSensors.getTempC(this->address);  
   mlog.DEBUG(value);
-  this->statistic.add( value );
+  this->putValue( value );
 }
 
 unsigned long TempSensor::prepare(){

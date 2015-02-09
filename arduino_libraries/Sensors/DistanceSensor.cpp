@@ -36,8 +36,8 @@ void DistanceSensor::measure(){
                               this->rangeOutMin, 
                               this->rangeOutMax);
     mlog.DEBUG(F(" out:"), false);
-    Serial.println(fValue);
-    this->statistic.add( fValue );
+    mlog.DEBUG(fValue);
+    this->putValue( fValue );
   } else {
     mlog.WARNING(F("SENSOR ERROR: "));
     mlog.WARNING(label, false);
