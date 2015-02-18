@@ -12,7 +12,13 @@
 #ifndef MultiLog_h
 #define MultiLog_h
 #include "Arduino.h"
+
+#define SD_SUPPORT
+
+#ifdef SD_SUPPORT
+//#include "SdFat.h"
 #include <SD.h>
+#endif
 
 #define LOG_SERIAL 1
 #define LOG_SOFTWARESERIAL 2
@@ -26,9 +32,12 @@
 
 
 
+
 class MultiLog {
   public:
+    #ifdef SD_SUPPORT
     File _file;
+    #endif
     byte _level;
     byte _targets;
 
@@ -76,7 +85,8 @@ class MultiLog {
     }
 
   protected:
-    inline void fprint_P(const __FlashStringHelper *ifsh){
+    #ifdef SD_SUPPORT
+    void fprint_P(const __FlashStringHelper *ifsh){
       const char PROGMEM *p = (const char PROGMEM *)ifsh;
       size_t n = 0;
       while (1) {
@@ -85,8 +95,9 @@ class MultiLog {
         n += _file.print(c);
       }
     }
+    #endif
     
-    inline void print(const __FlashStringHelper* string, 
+    void print(const __FlashStringHelper* string, 
                       const __FlashStringHelper* label = NULL){
         if (_targets & LOG_SERIAL){
           if (label){
@@ -94,6 +105,7 @@ class MultiLog {
           }
           Serial.print(string);
         }
+        #ifdef SD_SUPPORT
         if (_targets & LOG_FILE){
           if (label){
             fprint_P(label);
@@ -101,10 +113,11 @@ class MultiLog {
           fprint_P(string);
           _file.flush();
         }
+        #endif
     }
 
 
-    inline void print(const char* string, 
+    void print(const char* string, 
                       const __FlashStringHelper* label = NULL){
         if (_targets & LOG_SERIAL){
           if (label){
@@ -112,6 +125,7 @@ class MultiLog {
           }
           Serial.print(string);
         }
+        #ifdef SD_SUPPORT
         if (_targets & LOG_FILE){
           if (label){
             fprint_P(label);
@@ -119,9 +133,10 @@ class MultiLog {
           _file.print(string);
           _file.flush();
         }
+        #endif
     }
 
-    inline void print(int number, 
+    void print(int number, 
                       const __FlashStringHelper* label = NULL){
         if (_targets & LOG_SERIAL){
           if (label){
@@ -129,6 +144,7 @@ class MultiLog {
           }
           Serial.print(number);
         }
+        #ifdef SD_SUPPORT
         if (_targets & LOG_FILE){
           if (label){
             fprint_P(label);
@@ -136,9 +152,10 @@ class MultiLog {
           _file.print(number);
           _file.flush();
         }
+        #endif
     }
 
-    inline void print(float number, 
+    void print(float number, 
                       const __FlashStringHelper* label = NULL){
         if (_targets & LOG_SERIAL){
           if (label){
@@ -146,6 +163,7 @@ class MultiLog {
           }
           Serial.print(number);
         }
+        #ifdef SD_SUPPORT
         if (_targets & LOG_FILE){
           if (label){
             fprint_P(label);
@@ -153,6 +171,7 @@ class MultiLog {
           _file.print(number);
           _file.flush();
         }
+        #endif
     }
 };
 

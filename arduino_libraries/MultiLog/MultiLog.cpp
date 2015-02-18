@@ -13,7 +13,9 @@
 //File MultiLog::_file = File();
 
 MultiLog mlog;
-
+#ifdef SD_SUPPORT
+//SdFat SD;
+#endif
 
 MultiLog::MultiLog(byte level, byte targets)
 {
@@ -28,7 +30,14 @@ boolean MultiLog::openFile(){
   }
   delay(500);
 */
+  #ifdef SD_SUPPORT
   _file = SD.open("logfile.txt", FILE_WRITE);
+  
+  if (_file.size() > 1000000000){ // remove logfiles over 1GB
+    _file.close();
+    SD.remove("logfile.txt");
+    _file = SD.open("logfile.txt", FILE_WRITE);
+  }
   if (_file == NULL){
       Serial.println("openfile - failed");
   }
@@ -36,6 +45,7 @@ boolean MultiLog::openFile(){
   _file.println("");
   _file.println("=== NEW LOG =====================");
   _file.flush();
+  #endif
   return true;
 }
 
