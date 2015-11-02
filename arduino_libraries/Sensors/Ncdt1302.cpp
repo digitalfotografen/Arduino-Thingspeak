@@ -124,6 +124,13 @@ boolean Ncdt1302::begin(long baudrate){
           delay(1000);
         }
         
+/*
+        if (setParameter(NCDT1302_SET_SAVE_SETTINGS_MODE, NCDT1302_FLASH)){
+          mlog.DEBUG(F("Ncdt1302 SET_SAVE_SETTINGS_MODE flash"));
+        } else {
+          mlog.CRITICAL(F("Ncdt1302 Failed to SET_SAVE_SETTINGS_MODE flash"));
+        }
+*/
         if (!setParameter(NCDT1302_SET_BAUDRATE, baudrateCode)){
           mlog.INFO(F("Ncdt1302 failed to set baudrate"));
           _serial = NULL;
@@ -149,15 +156,37 @@ boolean Ncdt1302::begin(long baudrate){
           mlog.CRITICAL(F("Ncdt1302 Failed to SET_EXT_INPUT_MODE"));
         }
 
+        if (setParameter(NCDT1302_SET_AV, NCDT1302_MEDIAN, 0x00000005)){
+          mlog.DEBUG(F("Ncdt1302 SET_AV MEDIAN 5"));
+        } else {
+          mlog.CRITICAL(F("Ncdt1302 Failed to SET_AV"));
+        }
+
+        
+        if (setParameter(NCDT1302_SET_OUTPUTMODE, NCDT1302_TIME_BASED)){
+          mlog.DEBUG(F("Ncdt1302 SET_OUTPUTMODES timebased"));
+        } else {
+          mlog.CRITICAL(F("Ncdt1302 Failed to SET_OUTPUTMODE"));
+        }
+
+        
+        if (setParameter(NCDT1302_SET_OUTPUTTIME_MS, NCDT1302_MEDIAN, 0x00000014)){
+          mlog.DEBUG(F("Ncdt1302 _SET_OUTPUTTIME_MS 20 ms"));
+        } else {
+          mlog.CRITICAL(F("Ncdt1302 Failed to _SET_OUTPUTTIME_MS"));
+        }
+        
+
         i = 5;
       }
     }
   }
   
+  /*
   if (command(NCDT1302_DAT_OUT_OFF)){
     mlog.DEBUG(F("Ncdt1302 DATA_OUT_OFF"));
   }
-
+  */
   laserOnOff(true);
   return true;
 }
@@ -172,7 +201,7 @@ void Ncdt1302::measure(){
   int high = 0;
   int low = 0;
   int value = 0;
-  unsigned long timeout = millis() + 500;
+  unsigned long timeout = millis() + 100;
 
   mlog.DEBUG(F("Ncdt1302 measure:"));
   mlog.DEBUG(label, false);
@@ -185,6 +214,7 @@ void Ncdt1302::measure(){
   dumpBuffer();
   while ((_serial->available() < 2) && (millis() < timeout)){
     // wait for data
+    delay(10);
   }
   timeout = millis() + 100;
   do {
@@ -250,22 +280,26 @@ unsigned long Ncdt1302::prepare(){
   mlog.DEBUG(this->label, false);
   laserOnOff(true);
 
+  /*
   mlog.DEBUG(F("Ncdt1302 DATA_OUT_ON"));
   if (!command(NCDT1302_DAT_OUT_ON)){
     mlog.WARNING(F("DATA_OUT_ON failed"));
   }
+  */
   unsigned long t = Sensor::prepare();
   return max(t, this->prepareTime); // Laser sensor needs 500 ms
   disable();
 }
 
 void Ncdt1302::sleep(){
-  mlog.DEBUG(F("Ncdt1302 sleep"));
-  mlog.DEBUG(F("Ncdt1302 DATA_OUT_OFF"));
   enable();
+  mlog.DEBUG(F("Ncdt1302 sleep"));
+  /*
+  mlog.DEBUG(F("Ncdt1302 DATA_OUT_OFF"));
   if (!command(NCDT1302_DAT_OUT_OFF)){
     mlog.WARNING(F("DATA_OUT_OFF failed"));
   }
+  */
   laserOnOff(false);
   Sensor::sleep();
   disable();
@@ -304,21 +338,27 @@ boolean Ncdt1302::command(unsigned long com){
   for (int i = 0; i < 3; i++){
     dumpBuffer();
     // a command starts with 0x20
-    write(com | 0x20000000, true);
-    // response is same as command but first byte is A0
-    if (readResponseValue() == (com| 0xA0000000)) 
+    write(com, true);
+    // response is same as command but first byte is A0 ans last is 02
+    unsigned long expectedResponse = com & 0x00FFFF00;
+    expectedResponse |= 0xA0000002;
+    if (readResponseValue() == expectedResponse) 
       return true;
   }
   return false;
 }
 
-boolean Ncdt1302::setParameter(unsigned long com, unsigned long data){
+boolean Ncdt1302::setParameter(unsigned long com, unsigned long d1, unsigned long d2){
   for (int i = 0; i < 3; i++){
     dumpBuffer();
-    write(com | 0x20000000, true);
-    write(data);
-    // response is same as command but last bit is zero and first byte is A0
-    if (readResponseValue() == (com & 0xFFFFFFFE | 0xA0000000)) 
+    write(com, true);
+    write(d1);
+    if (d2 != 0xFFFFFFFF){
+      write(d2);
+    }
+    unsigned long expectedResponse = com & 0x00FFFF00;
+    expectedResponse |= 0xA0000002;
+    if (readResponseValue() == expectedResponse) 
       return true;
   }
   return false;
@@ -352,7 +392,7 @@ boolean Ncdt1302::readResponse(byte *response, int length){
   char start[5] = "ILD1";
   char end[5] = {0x20, 0x20, 0x0D, 0x0A, 0x00};
 
-  unsigned long timout =  millis() + 300; 
+  unsigned long timout =  millis() + 200; 
 
   // workaround due to trouble with serial->find(s) and timeout
   while ((millis() < timout) && (pos < 4)){
@@ -364,9 +404,16 @@ boolean Ncdt1302::readResponse(byte *response, int length){
         }
       }
     }
+    if (!_serial->available()){
+      delay(20);
+    }
   }
-  
-  if (pos == 4){
+
+  if (_serial->available() < 4){
+    delay(20);
+  }
+
+  if ((pos == 4) && (millis() < timout)){
     _serial->readBytes(response, length);
     if (_serial->find(end)){
       return true;
