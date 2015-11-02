@@ -9,7 +9,7 @@ TempSensor::TempSensor(char *_label, const byte * address) : Sensor(_label){
       this->address[i] = address[i];
     }
   }
-  this->setPrepareTime(750);
+  this->setPrepareTime(1000);
 }
 
 void TempSensor::setAddress(char *strAddress){
@@ -70,14 +70,14 @@ void TempSensor::discoverOneWireDevices(void) {
   while(oneWire.search(addr)) {
     mlog.INFO(F("Found \'1-Wire\' device with address:"));
     for( i = 0; i < 8; i++) {
-      mlog.INFO(F("0x"));
+      mlog.INFO(F("0x"),false);
       if (addr[i] < 16) {
-        mlog.INFO(F("0"));
+        mlog.INFO(F("0"),false);
       }
       itoa(addr[i], toHex, 16);
       mlog.INFO(toHex, false);
       if (i < 7) {
-        mlog.INFO(F(", "));
+        mlog.INFO(F(","),false);
       }
     }
     if ( OneWire::crc8( addr, 7) != addr[7]) {

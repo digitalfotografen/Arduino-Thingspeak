@@ -16,7 +16,7 @@ void SensorGroup::addSensor(Sensor *sensor){
 }
 
 void SensorGroup::measureAll(){
-  if (numberOfSensors > 0){
+  if (this->numberOfSensors > 0){
     for (int i = 0; i < this->numberOfSensors; i++){
       sensors[i]->measure();
     }
@@ -28,7 +28,8 @@ void SensorGroup::measureAll(){
 unsigned long SensorGroup::prepare(){
   unsigned long maxTime = 0;
   unsigned long t = 0;
-  if (numberOfSensors > 0){
+  mlog.DEBUG(F("SensorGroup::prepare"));
+  if (this->numberOfSensors > 0){
     for (int i = 0; i < this->numberOfSensors; i++){
       t = this->sensors[i]->prepare();
       maxTime = max(maxTime, t);

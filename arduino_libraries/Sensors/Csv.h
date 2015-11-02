@@ -8,7 +8,8 @@
 
 class Csv : public SensorGroup {
   public:
-    Csv(const char* _apiKey);
+    Csv();
+    virtual boolean begin(const char* filename);
     virtual void toString(char *buff);
     virtual void save();
     

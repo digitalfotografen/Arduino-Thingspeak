@@ -7,7 +7,8 @@
 #include "Sensor.h"
 #include "MultiLog.h"
 
-#define ONEWIRE_PIN 40
+//#define ONEWIRE_PIN 40
+#define ONEWIRE_PIN 4
 
 
 // Setup a oneWire instance to communicate with any OneWire devices

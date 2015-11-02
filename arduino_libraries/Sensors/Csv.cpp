@@ -1,8 +1,13 @@
 #include "Csv.h"
 
-Csv::Csv(const char* filename) : SensorGroup(){
+Csv::Csv() : SensorGroup(){
+}
+
+boolean Csv::begin(const char* filename){
   _file = SD.open(filename, FILE_WRITE);
   _file.flush();
+  if (_file) return true; 
+  else return false;
 }
 
 void Csv::toString(char* buff){
@@ -41,12 +46,12 @@ void Csv::save(){
   _file.print(minute());
   //mlog.TRACE(minute(), false);
   //mlog.TRACE(F(":"), false);
-  _file.print(" ");
+  _file.print(":");
   _file.print(second());
   //mlog.TRACE(second(), false);
   if (numberOfSensors > 0){
     for (int i = 0; i < numberOfSensors; i++){
-      strcpy(buff, ",");
+      _file.print(",");
       sensors[i]->toString(buff, 20, SENSOR_LAST);
       _file.print(buff);
       //mlog.TRACE(F(","), false);
